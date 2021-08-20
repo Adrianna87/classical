@@ -1,0 +1,37 @@
+Classical Chopin Liszt
+
+1. What goal will your website be designed to achieve? 
+
+	The website will achieven the goal of allowing users to explore classical music
+
+2. What kind of users will visit your site? In other words, what is the demographic of 
+your users? 
+
+	Classical music lovers will visit the site
+
+3. What data do you plan on using? You may have not picked your actual API yet, 
+which is fine, just outline what kind of data you would like it to contain. 
+
+	The data from Openopus.org lists pieces of music by composers. Data includes "period" (Medieval, 	Renaissance, Baroque, Classical, Early Romantic, Romantic, Late Romantic, 20th Century, Post-War, 	21st Century) as well as "genre" (chamber, keyboard, orchestral, stage, and vocal). 
+
+4. In brief, outline your approach to creating your project (knowing that you may not 
+know everything in advance and that these details might change later). Answer 
+questions like the ones below, but feel free to add more information: 
+  
+  a. What does your database schema look like? 
+	There will be a users table and a user's playlists table. There will also be a pieces table and a 	playlists_pieces table to allow for a reccomendation system.
+
+  b. What kinds of issues might you run into with your API? 
+	Open opus is a wiki-style free-to-edit database so data may change
+
+  c. Is there any sensitive information you need to secure? 
+	User login information.
+
+  d. What functionality will your app include? 
+	Users can search for music without logging in but will need an account in order to create a favorites 	playlist and recieve recommendations.
+	
+  e. What will the user flow look like?
+	A user will come to the homepage and may search for music. If they attempt to favorite a piece of 		music they will be prompted to sign in or create an account. After account creation & login, users 	can create/edit a playlist of their favorite pieces. They can see other users' playlists but cannot 	edit them. Users may also choose to find new pieces or new composers from recommendations based on 	their current playlist. Users can log out and also have the option of deleting their account. When an 	account is deleted, so is their playlist.
+
+  f. What features make your site more than CRUD? Do you have any stretch goals? 
+	The recommendation system makes this more than CRUD. Stretch goals include linking pieces of music to 	audio, recommendation system based on users's playlist ("other people who favorited Beethoven's 5th 		also listen to...")
