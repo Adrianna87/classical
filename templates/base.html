@@ -1,12 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+  <title>{% block title %}Classical{% endblock %}</title>
+  <script src="https://unpkg.com/jquery"></script>
 </head>
+
 <body>
-  
+  <nav>
+    <div class="topnav">
+      <a class="nav-link" href="/" id="nav-home">Home</a>
+      |
+      <a class="nav-link" href="/search" id="nav-search">Search</a>
+      |
+      <a class="nav-link" href="/playlists" id="nav-playlists">Playlists</a>
+      |
+      <a class="nav-link" href="/signup" id="nav-login">Signup</a>
+      |
+      <a class="nav-link" href="/login" id="nav-login">Login</a>
+      |
+      <a class="nav-link" href="/profile" id="nav-profile">Profile</a>
+      |
+      <a class="nav-link" href="/logout" id="nav-logout">Logout</a>
+    </div>
+  </nav>
+  <div class="container">
+    {% block content %}
+    {% endblock %}
+  </div>
+  <script src="https://unpkg.com/axios/dist/axios.js"></script>
 </body>
+
 </html>

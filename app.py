@@ -1,5 +1,6 @@
-from flask import Flask, render_template, request, flash, redirect, IntegrityError, session, g
+from flask import Flask, render_template, request, flash, redirect, session, g
 from flask_debugtoolbar import DebugToolbarExtension
+from sqlalchemy.exc import IntegrityError
 
 from forms import UserAddForm, LoginForm, UserEditForm
 from models import db, connect_db, User
@@ -18,6 +19,19 @@ toolbar = DebugToolbarExtension(app)
 
 connect_db(app)
 
+
+@app.route("/")
+def homepage():
+    """Show homepage."""
+
+    return render_template("index.html")
+
+
+@app.errorhandler(404)
+def page_not_found(e):
+    """404 NOT FOUND page."""
+
+    return render_template('404.html'), 404
 ##########
 # User signup/login/logout
 ##########
@@ -50,7 +64,7 @@ def do_logout():
 @app.route('/signup', methods=["GET", "POST"])
 def signup():
     """
-    Handle user signup. 
+    Handle user signup.
     Create new user and add to DB. Redirect to home page.
     If form not valid, present form.
     If the there already is a user with that username: flash message
@@ -80,104 +94,103 @@ def signup():
         return render_template('users/signup.html', form=form)
 
 
-@app.route('/login', methods=["GET", "POST"])
-def login():
-    """Handle user login."""
+# @app.route('/login', methods=["GET", "POST"])
+# def login():
+#     """Handle user login."""
 
-    form = LoginForm()
+#     form = LoginForm()
 
-    if form.validate_on_submit():
-        user = User.authenticate(form.username.data,
-                                 form.password.data)
+#     if form.validate_on_submit():
+#         user = User.authenticate(form.username.data,
+#                                  form.password.data)
 
-        if user:
-            do_login(user)
-            flash(f"Hello, {user.username}!", "success")
-            return redirect("/")
+#         if user:
+#             do_login(user)
+#             flash(f"Hello, {user.username}!", "success")
+#             return redirect("/")
 
-        flash("Invalid credentials.", 'danger')
+#         flash("Invalid credentials.", 'danger')
 
-    return render_template('users/login.html', form=form)
-
-
-@app.route('/logout')
-def logout():
-    """Handle logout of user."""
-
-    do_logout()
-    flash("Goodbye")
-    return redirect("/")
-
-##########
-# General user routes:
-##########
+#     return render_template('users/login.html', form=form)
 
 
-@app.route('/users')
-def list_users():
-    """Page with listing of users.
+# @app.route('/logout')
+# def logout():
+#     """Handle logout of user."""
 
-    Can take a 'q' param in querystring to search by that username.
-    """
+#     do_logout()
+#     flash("Goodbye")
+#     return redirect("/")
 
-    search = request.args.get('q')
-
-    if not search:
-        users = User.query.all()
-    else:
-        users = User.query.filter(User.username.like(f"%{search}%")).all()
-
-    return render_template('users/index.html', users=users)
+# ##########
+# # General user routes:
+# ##########
 
 
-@app.route('/users/<int:user_id>')
-def users_show(user_id):
-    """Show user profile."""
+# @app.route('/users')
+# def list_users():
+#     """Page with listing of users.
 
-    user = User.query.get_or_404(user_id)
+#     Can take a 'q' param in querystring to search by that username.
+#     """
 
-    playlists =
-    return render_template('users/show.html', user=user, playlists=playlists)
+#     search = request.args.get('q')
 
+#     if not search:
+#         users = User.query.all()
+#     else:
+#         users = User.query.filter(User.username.like(f"%{search}%")).all()
 
-@app.route('/users/profile', methods=["GET", "POST"])
-def profile():
-    """Update profile for current user."""
-
-    if not g.user:
-        flash("Only logged in users can edit their profile!")
-        return redirect("/")
-
-    user = g.user
-    form = UserEditForm(obj=user)
-
-    if form.validate_on_submit():
-        if User.authenticate(user.username, form.password.data):
-            user.username = form.username.data
-            user.email = form.email.data
-            user.image_url = form.image_url.data or "/static/images/default-pic.png"
-            user.header_image_url = form.header_image_url.data or "/static/images/warbler-hero.jpg"
-            user.bio = form.bio.data
-
-            db.session.commit()
-            return redirect(f"/users/{user.id}")
-
-        flash("Wrong password, please try again.", 'danger')
-
-    return render_template('users/edit.html', form=form, user_id=user.id)
+#     return render_template('users/index.html', users=users)
 
 
-@app.route('/users/delete', methods=["POST"])
-def delete_user():
-    """Delete user."""
+# @app.route('/users/<int:user_id>')
+# def users_show(user_id):
+#     """Show user profile."""
 
-    if not g.user:
-        flash("Access unauthorized.", "danger")
-        return redirect("/")
+#     user = User.query.get_or_404(user_id)
 
-    do_logout()
+#     return render_template('users/show.html', user=user)
 
-    db.session.delete(g.user)
-    db.session.commit()
 
-    return redirect("/signup")
+# @app.route('/users/profile', methods=["GET", "POST"])
+# def profile():
+#     """Update profile for current user."""
+
+#     if not g.user:
+#         flash("Only logged in users can edit their profile!")
+#         return redirect("/")
+
+#     user = g.user
+#     form = UserEditForm(obj=user)
+
+#     if form.validate_on_submit():
+#         if User.authenticate(user.username, form.password.data):
+#             user.username = form.username.data
+#             user.email = form.email.data
+#             user.image_url = form.image_url.data or "/static/images/default-pic.png"
+#             user.header_image_url = form.header_image_url.data or "/static/images/warbler-hero.jpg"
+#             user.bio = form.bio.data
+
+#             db.session.commit()
+#             return redirect(f"/users/{user.id}")
+
+#         flash("Wrong password, please try again.", 'danger')
+
+#     return render_template('users/edit.html', form=form, user_id=user.id)
+
+
+# @app.route('/users/delete', methods=["POST"])
+# def delete_user():
+#     """Delete user."""
+
+#     if not g.user:
+#         flash("Access unauthorized.", "danger")
+#         return redirect("/")
+
+#     do_logout()
+
+#     db.session.delete(g.user)
+#     db.session.commit()
+
+#     return redirect("/signup")
