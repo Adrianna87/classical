@@ -8,4 +8,11 @@ Search
 
 <h1>Search for classical music</h1>
 
+<form action="/search" methods="POST">
+  <input id="search" type="text" name="search" placeholder="Composer name">
+  <button>Go!</button>
+</form>
+{% if info %}
+<div id=composer-list>{{info}}</div>
+{% endif %}
 {% endblock %}

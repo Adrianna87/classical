@@ -128,24 +128,20 @@ def signup():
 # ##########
 # # General user routes:
 # ##########
+@app.route('/search', methods=["GET", "POST"])
+def search_composers():
+    "Seach for composers"
+    composer = request.args.get("search")
+    url = f"{API_BASE_URL}/composer/list/search/{composer}.json"
+    resp = requests.get(url)
+    info = resp.json()
+    name = info['composers']
 
+    full_names = []
+    for full in name:
+        full_names.append(full['complete_name'])
 
-# @app.route('/users')
-# def list_users():
-#     """Page with listing of users.
-
-#     Can take a 'q' param in querystring to search by that username.
-#     """
-
-#     search = request.args.get('q')
-
-#     if not search:
-#         users = User.query.all()
-#     else:
-#         users = User.query.filter(User.username.like(f"%{search}%")).all()
-
-#     return render_template('users/index.html', users=users)
-
+    return render_template("search.html", info=full_names)
 
 # @app.route('/users/<int:user_id>')
 # def users_show(user_id):
