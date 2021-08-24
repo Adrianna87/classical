@@ -2,10 +2,13 @@ from flask import Flask, render_template, request, flash, redirect, session, g
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
 
+import requests
+
 from forms import UserAddForm, LoginForm, UserEditForm
 from models import db, connect_db, User
 
 CURR_USER_KEY = "curr_user"
+API_BASE_URL = "https://api.openopus.org"
 
 app = Flask(__name__)
 
