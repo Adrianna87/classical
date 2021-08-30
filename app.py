@@ -144,9 +144,20 @@ def search_composers():
     resp = requests.get(url)
     info = resp.json()
     composer_info = info['composers']
-    composer_full_name = list(map(lambda a: a['complete_name'], composer_info))
 
-    return render_template("search.html", info=composer_full_name)
+    return render_template("search.html", info=composer_info)
+
+
+@app.route('/composer/<int:composer_id>')
+def works_info(composer_id):
+    """List of composer's works"""
+
+    composer = composer_id
+    url = f"{API_BASE_URL}/work/list/composer/{composer}/genre/all.json"
+    resp = requests.get(url)
+    info = resp.json()
+
+    return render_template("composer.html", info=info)
 
 # @app.route('/users/<int:user_id>')
 # def users_show(user_id):

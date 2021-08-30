@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Composer's name
+{% endblock %}
+
+{% block content %}
+
+<h1>Composer's works</h1>
+
+{% if info %}
+<div id=works-list>
+  {{info}}
+</div>
+{% endif %}
+
+{% endblock %}
