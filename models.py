@@ -1,5 +1,3 @@
-from datetime import datetime
-
 from flask_bcrypt import Bcrypt
 from flask_sqlalchemy import SQLAlchemy
 
@@ -31,7 +29,7 @@ class User(db.Model):
     )
 
     username = db.Column(
-        db.Text,
+        db.String(20),
         nullable=False,
         unique=True,
     )
@@ -78,3 +76,87 @@ class User(db.Model):
                 return user
 
         return False
+
+
+class Playlist(db.Model):
+    """User in the system."""
+
+    __tablename__ = 'playlists'
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True,
+    )
+
+    playlist_name = db.Column(
+        db.String(50),
+        nullable=False,
+        unique=True,
+    )
+
+    playlist_desc = db.Column(
+        db.String(100),
+        nullable=True,
+        unique=False,
+    )
+
+    user_id = db.Column(
+        db.Integer,
+        db.ForeignKey('users.id', ondelete="cascade"),
+    )
+
+    playlist_piece = db.relationship('PlaylistPiece',
+                                     backref='playlist')
+    pieces = db.relationship('Piece',
+                             secondary='playlists_pieces',
+                             backref='playlists')
+
+
+class Piece(db.Model):
+    """User in the system."""
+
+    __tablename__ = 'pieces'
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True,
+    )
+
+    composer = db.Column(
+        db.Text,
+        nullable=False,
+    )
+
+    title = db.Column(
+        db.Text,
+        nullable=False,
+    )
+
+    genre = db.Column(
+        db.Text,
+        nullable=False,
+    )
+
+    era = db.Column(
+        db.Text,
+        nullable=False,
+    )
+
+    playlist_piece = db.relationship('PlaylistPiece',
+                                     backref='piece')
+    playlist = db.relationship('Playlist',
+                               secondary='playlists_pieces',
+                               backref='pieces')
+
+
+class PlaylistPiece(db.Model):
+    """User in the system."""
+
+    __tablename__ = 'playlists_works'
+
+    playlist_id = db.Column(db.Integer,
+                            db.ForeignKey("playlists.id"),
+                            primary_key=True)
+    piece_id = db.Column(db.Text,
+                         db.ForeignKey("pieces.id"),
+                         primary_key=True)

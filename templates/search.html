@@ -8,11 +8,18 @@ Search
 
 <h1>Search for classical music</h1>
 
-<form action="/search" methods="POST">
+<form action="/searchname" methods="POST">
+  <label for="search"></label>
   <input id="search" type="text" name="search" placeholder="Composer name">
-  <button>Go!</button>
+  <button>Search</button>
 </form>
 {% if info %}
-<div id=composer-list>{{info}}</div>
+<div id=composer-list>
+  <ul>
+    {% for name in info %}
+    <li>{{name}}</li>
+    {% endfor %}
+  </ul>
+</div>
 {% endif %}
 {% endblock %}

@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, flash, redirect, session, g
+from flask import Flask, render_template, jsonify, request, flash, redirect, session, g
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
 
@@ -109,7 +109,7 @@ def login():
         if user:
             do_login(user)
             flash(f"Hello, {user.username}!", "success")
-            return redirect("/")
+            return redirect("/profile")
 
         flash("Invalid credentials.", 'danger')
 
@@ -129,20 +129,24 @@ def logout():
 # ##########
 
 
-@app.route('/search', methods=["GET", "POST"])
+@app.route('/search')
+def search_form():
+    return render_template("search.html")
+
+
+@app.route('/searchname')
 def search_composers():
     "Seach for composers"
-    composer = request.args.get("search")
+
+    composer = request.args["search"]
     url = f"{API_BASE_URL}/composer/list/search/{composer}.json"
+
     resp = requests.get(url)
     info = resp.json()
-    name = info['composers']
+    composer_info = info['composers']
+    composer_full_name = list(map(lambda a: a['complete_name'], composer_info))
 
-    full_names = []
-    for full in name:
-        full_names.append(full['complete_name'])
-
-    return render_template("search.html", info=full_names)
+    return render_template("search.html", info=composer_full_name)
 
 # @app.route('/users/<int:user_id>')
 # def users_show(user_id):
