@@ -105,11 +105,30 @@ class Playlist(db.Model):
         db.ForeignKey('users.id', ondelete="cascade"),
     )
 
+    user = db.relationship('User', backref="playlists")
+
     playlist_piece = db.relationship('PlaylistPiece',
                                      backref='playlist')
-    pieces = db.relationship('Piece',
-                             secondary='playlists_pieces',
-                             backref='playlists')
+    # pieces = db.relationship('Piece',
+    #                          secondary='playlists_pieces',
+    #                          backref='playlists')
+
+    # def serialize(self):
+    #     return{"id": self.id,
+    #            "playlist_name": self.playlist_name,
+    #            "playlist_desc": self.playlist_desc,
+    #            "user_id": self.user_id}
+
+    @classmethod
+    def make(cls, playlist_name, playlist_desc):
+        """make a playlist"""
+        playlist = Playlist(
+            playlist_name=playlist_name,
+            playlist_desc=playlist_desc,
+        )
+
+        db.session.add(playlist)
+        return playlist
 
 
 class Piece(db.Model):
@@ -137,7 +156,7 @@ class Piece(db.Model):
         nullable=False,
     )
 
-    era = db.Column(
+    epoch = db.Column(
         db.Text,
         nullable=False,
     )
@@ -152,11 +171,11 @@ class Piece(db.Model):
 class PlaylistPiece(db.Model):
     """User in the system."""
 
-    __tablename__ = 'playlists_works'
+    __tablename__ = 'playlists_pieces'
 
     playlist_id = db.Column(db.Integer,
                             db.ForeignKey("playlists.id"),
                             primary_key=True)
-    piece_id = db.Column(db.Text,
+    piece_id = db.Column(db.Integer,
                          db.ForeignKey("pieces.id"),
                          primary_key=True)

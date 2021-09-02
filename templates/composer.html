@@ -10,7 +10,11 @@ Composer's name
 
 {% if info %}
 <div id=works-list>
-  {{info}}
+  <ul id="composers">
+    {% for title in info %}
+    <li>{{title['title']}} - {{title['genre']}}</li>
+    {% endfor %}
+  </ul>
 </div>
 {% endif %}
 

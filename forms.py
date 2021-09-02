@@ -17,9 +17,7 @@ class UserEditForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
     email = StringField('E-mail', validators=[DataRequired(), Email()])
     password = PasswordField('Password', validators=[Length(min=6)])
-    image_url = StringField('(Optional) Image URL')
     bio = TextAreaField('(Optional) Tell us about yourself')
-    header_image_url = StringField('(optional) Header image url')
 
 
 class LoginForm(FlaskForm):
@@ -27,3 +25,10 @@ class LoginForm(FlaskForm):
 
     username = StringField('Username', validators=[DataRequired()])
     password = PasswordField('Password', validators=[Length(min=6)])
+
+
+class PlaylistForm(FlaskForm):
+    """Form for adding/editing playlists"""
+
+    playlist_name = StringField('text', validators=[DataRequired()])
+    playlist_desc = TextAreaField('text', validators=[DataRequired()])

@@ -4,8 +4,8 @@ from sqlalchemy.exc import IntegrityError
 
 import requests
 
-from forms import UserAddForm, LoginForm, UserEditForm
-from models import db, connect_db, User
+from forms import UserAddForm, LoginForm, UserEditForm, PlaylistForm
+from models import db, connect_db, User, Playlist, Piece, PlaylistPiece
 
 CURR_USER_KEY = "curr_user"
 API_BASE_URL = "https://api.openopus.org"
@@ -17,7 +17,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres:///classical'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = True
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
-app.config['SECRET_KEY'] = "it's a secret"
+app.config['SECRET_KEY'] = "secretsecret"
 toolbar = DebugToolbarExtension(app)
 
 connect_db(app)
@@ -73,6 +73,9 @@ def signup():
     If the there already is a user with that username: flash message
     and re-present form.
     """
+    if CURR_USER_KEY in session:
+        del session[CURR_USER_KEY]
+
     form = UserAddForm()
 
     if form.validate_on_submit():
@@ -86,7 +89,8 @@ def signup():
 
         except IntegrityError:
             flash("Username already taken", 'danger')
-            return render_template('users/signup.html', form=form)
+            # add logic for email already in use
+            return redirect('/signup')
 
         do_login(user)
 
@@ -125,7 +129,7 @@ def logout():
     return redirect("/")
 
 # ##########
-# # General user routes:
+# # Search routes:
 # ##########
 
 
@@ -156,16 +160,27 @@ def works_info(composer_id):
     url = f"{API_BASE_URL}/work/list/composer/{composer}/genre/all.json"
     resp = requests.get(url)
     info = resp.json()
+    works = info['works']
 
-    return render_template("composer.html", info=info)
+    return render_template("composer.html", info=works)
 
-# @app.route('/users/<int:user_id>')
-# def users_show(user_id):
-#     """Show user profile."""
+##########
+# User routes
+##########
 
-#     user = User.query.get_or_404(user_id)
 
-#     return render_template('users/show.html', user=user)
+@app.route('/profile')
+def profile_page():
+    return render_template("users/profile.html")
+
+
+@app.route('/profile/<int:user_id>')
+def users_show(user_id):
+    """Show user profile."""
+
+    user = User.query.get_or_404(user_id)
+
+    return render_template('users/profile.html', user=user)
 
 
 # @app.route('/users/profile', methods=["GET", "POST"])
@@ -209,3 +224,33 @@ def works_info(composer_id):
 #     db.session.commit()
 
 #     return redirect("/signup")
+##########
+# Playlist routes
+##########
+
+# @app.route('/playlists')
+# def playlist_page():
+#     return render_template("users/playlists.html")
+
+
+@app.route('/playlists', methods=["GET", "POST"])
+def make_playlist():
+    """make playlist"""
+    form = PlaylistForm()
+    all_playlists = Playlist.query.all()
+    if form.validate_on_submit():
+        try:
+            playlist_name = form.playlist_name.data,
+            playlist_desc = form.playlist_desc.data,
+            new_playlist = Playlist.make(playlist_name, playlist_desc)
+            db.session.add(new_playlist)
+            db.session.commit()
+
+        except IntegrityError:
+            flash("Playlist name already taken", 'danger')
+            return redirect('/playlists')
+
+        flash('Playlist created', "success")
+        return redirect('/playlists')
+
+    return render_template('users/playlists.html', form=form, playlists=all_playlists)
