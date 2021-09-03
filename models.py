@@ -39,6 +39,8 @@ class User(db.Model):
         nullable=False,
     )
 
+    favorites = db.relationship('Playlist', backref='user')
+
     @classmethod
     def signup(cls, username, email, password):
         """Sign up user.
@@ -79,7 +81,7 @@ class User(db.Model):
 
 
 class Playlist(db.Model):
-    """User in the system."""
+    """favorites"""
 
     __tablename__ = 'playlists'
 
@@ -88,62 +90,36 @@ class Playlist(db.Model):
         primary_key=True,
     )
 
-    playlist_name = db.Column(
-        db.String(50),
-        nullable=False,
-        unique=True,
-    )
-
-    playlist_desc = db.Column(
-        db.String(100),
-        nullable=True,
-        unique=False,
-    )
-
     user_id = db.Column(
         db.Integer,
         db.ForeignKey('users.id', ondelete="cascade"),
     )
 
-    user = db.relationship('User', backref="playlists")
+    works_id = db.Column(
+        db.Integer,
+        db.ForeignKey('works.id', ondelete="cascade")
+    )
 
-    playlist_piece = db.relationship('PlaylistPiece',
-                                     backref='playlist')
-    # pieces = db.relationship('Piece',
-    #                          secondary='playlists_pieces',
-    #                          backref='playlists')
+    # @classmethod
+    # def make(cls, playlist_name, playlist_desc):
+    #     """make a playlist"""
+    #     playlist = Playlist(
+    #         playlist_name=playlist_name,
+    #         playlist_desc=playlist_desc,
+    #     )
 
-    # def serialize(self):
-    #     return{"id": self.id,
-    #            "playlist_name": self.playlist_name,
-    #            "playlist_desc": self.playlist_desc,
-    #            "user_id": self.user_id}
-
-    @classmethod
-    def make(cls, playlist_name, playlist_desc):
-        """make a playlist"""
-        playlist = Playlist(
-            playlist_name=playlist_name,
-            playlist_desc=playlist_desc,
-        )
-
-        db.session.add(playlist)
-        return playlist
+    #     db.session.add(playlist)
+    #     return playlist
 
 
-class Piece(db.Model):
-    """User in the system."""
+class Works(db.Model):
+    """Works by composer"""
 
-    __tablename__ = 'pieces'
+    __tablename__ = 'works'
 
     id = db.Column(
         db.Integer,
         primary_key=True,
-    )
-
-    composer = db.Column(
-        db.Text,
-        nullable=False,
     )
 
     title = db.Column(
@@ -156,26 +132,39 @@ class Piece(db.Model):
         nullable=False,
     )
 
-    epoch = db.Column(
+    composer_id = db.Column(
+        db.Integer,
+        db.ForeignKey('composers.id', ondelete="cascade")
+    )
+
+    # composer = db.relationship('Composer', backref='works')
+    favorites = db.relationship('Playlist', backref='works')
+
+
+class Composer(db.Model):
+    """Composer info"""
+
+    __tablename__ = 'composers'
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True,
+    )
+
+    name = db.Column(
         db.Text,
         nullable=False,
     )
 
-    playlist_piece = db.relationship('PlaylistPiece',
-                                     backref='piece')
-    playlist = db.relationship('Playlist',
-                               secondary='playlists_pieces',
-                               backref='pieces')
+    epoch = db.Column(
+        db.Text,
+        nullable=False,
+    )
+    works = db.relationship('Works')
 
-
-class PlaylistPiece(db.Model):
-    """User in the system."""
-
-    __tablename__ = 'playlists_pieces'
-
-    playlist_id = db.Column(db.Integer,
-                            db.ForeignKey("playlists.id"),
-                            primary_key=True)
-    piece_id = db.Column(db.Integer,
-                         db.ForeignKey("pieces.id"),
-                         primary_key=True)
+    @classmethod
+    def composer_info(cls, id, name, epoch):
+        """Add composer info to database"""
+        composer_info = Composer(id=id, name=name, epoch=epoch)
+        db.session.add(composer_info)
+        return composer_info

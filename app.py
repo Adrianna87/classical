@@ -5,7 +5,7 @@ from sqlalchemy.exc import IntegrityError
 import requests
 
 from forms import UserAddForm, LoginForm, UserEditForm, PlaylistForm
-from models import db, connect_db, User, Playlist, Piece, PlaylistPiece
+from models import db, connect_db, User, Playlist, Works, Composer
 
 CURR_USER_KEY = "curr_user"
 API_BASE_URL = "https://api.openopus.org"
@@ -59,7 +59,6 @@ def do_login(user):
 
 def do_logout():
     """Logout user."""
-
     if CURR_USER_KEY in session:
         del session[CURR_USER_KEY]
 
@@ -73,8 +72,9 @@ def signup():
     If the there already is a user with that username: flash message
     and re-present form.
     """
-    if CURR_USER_KEY in session:
-        del session[CURR_USER_KEY]
+    if g.user:
+        flash("Already logged in!", "danger")
+        return redirect("/profile")
 
     form = UserAddForm()
 
@@ -103,6 +103,9 @@ def signup():
 @app.route('/login', methods=["GET", "POST"])
 def login():
     """Handle user login."""
+    if g.user:
+        flash("Already logged in!", "danger")
+        return redirect("/profile")
 
     form = LoginForm()
 
@@ -123,6 +126,9 @@ def login():
 @app.route('/logout')
 def logout():
     """Handle logout of user."""
+    if not g.user:
+        flash("Please log in first", "danger")
+        return redirect("/login")
 
     do_logout()
     flash("Goodbye")
@@ -172,6 +178,11 @@ def works_info(composer_id):
 
 @app.route('/profile')
 def profile_page():
+    """User's profile page only viewable if logged in"""
+    if not g.user:
+        flash("Please log in first", "danger")
+        return redirect("/login")
+
     return render_template("users/profile.html")
 
 
@@ -234,24 +245,10 @@ def users_show(user_id):
 #     return render_template("users/playlists.html")
 
 
-@app.route('/playlists', methods=["GET", "POST"])
-def make_playlist():
-    """make playlist"""
-    form = PlaylistForm()
-    all_playlists = Playlist.query.all()
-    if form.validate_on_submit():
-        try:
-            playlist_name = form.playlist_name.data,
-            playlist_desc = form.playlist_desc.data,
-            new_playlist = Playlist.make(playlist_name, playlist_desc)
-            db.session.add(new_playlist)
-            db.session.commit()
-
-        except IntegrityError:
-            flash("Playlist name already taken", 'danger')
-            return redirect('/playlists')
-
-        flash('Playlist created', "success")
-        return redirect('/playlists')
-
-    return render_template('users/playlists.html', form=form, playlists=all_playlists)
+@app.route('/playlists')
+def show_playlist():
+    """show playlist"""
+    if not g.user:
+        flash("please login first", "danger")
+        return redirect("/login")
+    return render_template('users/playlists.html')
