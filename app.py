@@ -161,8 +161,9 @@ def works_info(composer_id):
     resp = requests.get(url)
     info = resp.json()
     works = info['works']
+    composer = info['composer']
 
-    return render_template("composer.html", info=works)
+    return render_template("composer.html", works=works, info=info, composer=composer)
 
 ##########
 # User routes

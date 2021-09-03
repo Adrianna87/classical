@@ -8,5 +8,10 @@
 // const composer = await $.getJSON(`${baseURL}/composer/list/search/${search}.json`);
 // $("#search").trigger("reset");
 // }
+console.log("hello")
 
-// $("#composers").on("click", getComposer)
+function makePlaylist(e) {
+  console.log(e.target.id);
+}
+
+$("#works").on("click", "button", makePlaylist)
