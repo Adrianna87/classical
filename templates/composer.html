@@ -16,7 +16,7 @@
     {% for title in works %}
     <li>
       {{title['title']}} - {{title['genre']}}
-      <button id="{{works.index(title)}}">Add to playlist</button>
+      <button id="{{title['id']}}">Add to playlist</button>
     </li>
     {% endfor %}
   </ul>

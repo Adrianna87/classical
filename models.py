@@ -137,8 +137,23 @@ class Works(db.Model):
         db.ForeignKey('composers.id', ondelete="cascade")
     )
 
+    opus_work_id = db.Column(
+        db.Integer,
+        nullable=False,
+    )
     # composer = db.relationship('Composer', backref='works')
     favorites = db.relationship('Playlist', backref='works')
+
+    @classmethod
+    def work_info(cls, title, genre, composer_id, opus_work_id):
+        """Add composer info to database"""
+        work_info = Composer(
+            title=title,
+            genre=genre,
+            composer_id=composer_id,
+            opus_work_id=opus_work_id)
+        db.session.add(work_info)
+        return work_info
 
 
 class Composer(db.Model):
@@ -160,11 +175,17 @@ class Composer(db.Model):
         db.Text,
         nullable=False,
     )
+
+    opus_composer_id = db.Column(
+        db.Integer,
+        nullable=False,
+    )
     works = db.relationship('Works')
 
     @classmethod
-    def composer_info(cls, id, name, epoch):
+    def composer_info(cls, name, epoch, opus_composer_id):
         """Add composer info to database"""
-        composer_info = Composer(id=id, name=name, epoch=epoch)
+        composer_info = Composer(
+            name=name, epoch=epoch, opus_composer_id=opus_composer_id)
         db.session.add(composer_info)
         return composer_info

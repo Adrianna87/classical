@@ -4,7 +4,7 @@ from sqlalchemy.exc import IntegrityError
 
 import requests
 
-from forms import UserAddForm, LoginForm, UserEditForm, PlaylistForm
+from forms import UserAddForm, LoginForm, UserEditForm, ComposerForm
 from models import db, connect_db, User, Playlist, Works, Composer
 
 CURR_USER_KEY = "curr_user"
@@ -171,6 +171,26 @@ def works_info(composer_id):
 
     return render_template("composer.html", works=works, info=info, composer=composer)
 
+
+@app.route('/addcomposer/<int:composer_id>')
+def add_composer(composer_id):
+    """add composer to database"""
+    composer = composer_id
+    url = f"{API_BASE_URL}/work/list/composer/{composer}/genre/all.json"
+    resp = requests.get(url)
+    info = resp.json()
+    composer_info = info['composer']
+    return jsonify(composer_info)
+
+
+@app.route('/addwork/<int:work_id>')
+def add_work(work_id):
+    """add work to database"""
+    work = work_id
+    url = f"{API_BASE_URL}/work/detail/{work}.json"
+    resp = requests.get(url)
+    info = resp.json()
+    return jsonify(info['work'])
 ##########
 # User routes
 ##########
@@ -251,4 +271,5 @@ def show_playlist():
     if not g.user:
         flash("please login first", "danger")
         return redirect("/login")
+
     return render_template('users/playlists.html')
