@@ -15,8 +15,10 @@
   <ul id="works">
     {% for title in works %}
     <li>
-      {{title['title']}} - {{title['genre']}}
-      <button id="{{title['id']}}">Add to playlist</button>
+      <form action="/addfavorite/{{title['id']}}">
+        {{title['title']}} - {{title['genre']}}
+        <button>Add to playlist</button>
+      </form>
     </li>
     {% endfor %}
   </ul>

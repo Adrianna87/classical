@@ -5,7 +5,7 @@ from sqlalchemy.exc import IntegrityError
 import requests
 
 from forms import UserAddForm, LoginForm, UserEditForm, ComposerForm
-from models import db, connect_db, User, Playlist, Works, Composer
+from models import db, connect_db, User, Favorite
 
 CURR_USER_KEY = "curr_user"
 API_BASE_URL = "https://api.openopus.org"
@@ -172,25 +172,47 @@ def works_info(composer_id):
     return render_template("composer.html", works=works, info=info, composer=composer)
 
 
-@app.route('/addcomposer/<int:composer_id>')
-def add_composer(composer_id):
-    """add composer to database"""
-    composer = composer_id
-    url = f"{API_BASE_URL}/work/list/composer/{composer}/genre/all.json"
-    resp = requests.get(url)
-    info = resp.json()
-    composer_info = info['composer']
-    return jsonify(composer_info)
+# @app.route('/workinfo/<int:work_id>')
+# def add_work(work_id):
+#     """add work to database"""
+#     work = work_id
+#     url = f"{API_BASE_URL}/work/detail/{work}.json"
+#     resp = requests.get(url)
+#     info = resp.json()
+#     return jsonify(info['composer'], info['work'])
 
 
-@app.route('/addwork/<int:work_id>')
-def add_work(work_id):
-    """add work to database"""
+@app.route('/favorites')
+def show_playlist():
+    """show playlist"""
+    if not g.user:
+        flash("please login first", "danger")
+        return redirect("/login")
+
+    return render_template('users/playlists.html')
+
+
+@app.route('/addfavorite/<int:work_id>')
+def add_favorite(work_id):
+    """add to favorites"""
+    if not g.user:
+        flash("please login first", "danger")
+        return redirect("/login")
+
     work = work_id
     url = f"{API_BASE_URL}/work/detail/{work}.json"
     resp = requests.get(url)
     info = resp.json()
-    return jsonify(info['work'])
+    favorite = Favorite(user_id=g.user.id,
+                        composer_id=info['composer']['id'],
+                        opus_work_id=info['work']['id'],
+                        title=info['work']['title'],
+                        genre=info['work']['genre'])
+    db.session.add(favorite)
+    db.session.commit()
+
+    return redirect('/playlists')
+
 ##########
 # User routes
 ##########
@@ -260,16 +282,14 @@ def users_show(user_id):
 # Playlist routes
 ##########
 
-# @app.route('/playlists')
-# def playlist_page():
-#     return render_template("users/playlists.html")
-
-
 @app.route('/playlists')
-def show_playlist():
-    """show playlist"""
-    if not g.user:
-        flash("please login first", "danger")
-        return redirect("/login")
+def playlist_page():
+    return render_template("users/playlists.html")
 
-    return render_template('users/playlists.html')
+
+# @app.route('makeplaylist')
+# def make_playlist():
+#   """Make playlist for user"""
+#   if not g.user:
+#       flash("please login first", "danger")
+#       return redirect("/login")

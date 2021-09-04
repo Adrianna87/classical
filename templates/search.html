@@ -17,7 +17,7 @@ Search
 <div id=composer-list>
   <ul id="composers">
     {% for name in info %}
-    <li id="{{name['id']}}"><a href="/composer/{{name['id']}}">{{name['complete_name']}}</a></li>
+    <li><a href="/composer/{{name['id']}}" id="{{name['id']}}">{{name['complete_name']}}</a></li>
     {% endfor %}
   </ul>
 </div>

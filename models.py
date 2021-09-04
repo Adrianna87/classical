@@ -39,8 +39,6 @@ class User(db.Model):
         nullable=False,
     )
 
-    favorites = db.relationship('Playlist', backref='user')
-
     @classmethod
     def signup(cls, username, email, password):
         """Sign up user.
@@ -80,10 +78,10 @@ class User(db.Model):
         return False
 
 
-class Playlist(db.Model):
+class Favorite(db.Model):
     """favorites"""
 
-    __tablename__ = 'playlists'
+    __tablename__ = 'favorites'
 
     id = db.Column(
         db.Integer,
@@ -95,31 +93,15 @@ class Playlist(db.Model):
         db.ForeignKey('users.id', ondelete="cascade"),
     )
 
-    works_id = db.Column(
+    composer_id = db.Column(
         db.Integer,
-        db.ForeignKey('works.id', ondelete="cascade")
+        nullable=False
     )
 
-    # @classmethod
-    # def make(cls, playlist_name, playlist_desc):
-    #     """make a playlist"""
-    #     playlist = Playlist(
-    #         playlist_name=playlist_name,
-    #         playlist_desc=playlist_desc,
-    #     )
-
-    #     db.session.add(playlist)
-    #     return playlist
-
-
-class Works(db.Model):
-    """Works by composer"""
-
-    __tablename__ = 'works'
-
-    id = db.Column(
+    opus_work_id = db.Column(
         db.Integer,
-        primary_key=True,
+        nullable=False,
+        unique=True
     )
 
     title = db.Column(
@@ -131,61 +113,8 @@ class Works(db.Model):
         db.Text,
         nullable=False,
     )
+    users = db.relationship('User', backref='favorites')
 
-    composer_id = db.Column(
-        db.Integer,
-        db.ForeignKey('composers.id', ondelete="cascade")
-    )
-
-    opus_work_id = db.Column(
-        db.Integer,
-        nullable=False,
-    )
-    # composer = db.relationship('Composer', backref='works')
-    favorites = db.relationship('Playlist', backref='works')
-
-    @classmethod
-    def work_info(cls, title, genre, composer_id, opus_work_id):
-        """Add composer info to database"""
-        work_info = Composer(
-            title=title,
-            genre=genre,
-            composer_id=composer_id,
-            opus_work_id=opus_work_id)
-        db.session.add(work_info)
-        return work_info
-
-
-class Composer(db.Model):
-    """Composer info"""
-
-    __tablename__ = 'composers'
-
-    id = db.Column(
-        db.Integer,
-        primary_key=True,
-    )
-
-    name = db.Column(
-        db.Text,
-        nullable=False,
-    )
-
-    epoch = db.Column(
-        db.Text,
-        nullable=False,
-    )
-
-    opus_composer_id = db.Column(
-        db.Integer,
-        nullable=False,
-    )
-    works = db.relationship('Works')
-
-    @classmethod
-    def composer_info(cls, name, epoch, opus_composer_id):
-        """Add composer info to database"""
-        composer_info = Composer(
-            name=name, epoch=epoch, opus_composer_id=opus_composer_id)
-        db.session.add(composer_info)
-        return composer_info
+    # @classmethod
+    # def add_fav(cls, user_id, composer_id, opus_work_id, title, genre):
+    #     """add to favorites"""
