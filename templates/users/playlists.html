@@ -7,9 +7,16 @@ Playlists
 {% block content %}
 
 <h1>Your playlists</h1>
-
-<div class="row justify-content-md-center">
-  <div id="playlistPieces"></div>
+<div id="playlistPieces">
+  {% for title in favorites %}
+  <p>
+  <form action="/removefavorite/{{title['id']}}" method="POST">
+    {{title.title}}
+    <button>Remove</button>
+  </form>
+  </p>
+  {% endfor %}
 </div>
+
 
 {% endblock %}

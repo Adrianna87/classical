@@ -284,8 +284,26 @@ def users_show(user_id):
 
 @app.route('/playlists')
 def playlist_page():
-    return render_template("users/playlists.html")
+    if not g.user:
+        flash("please login first", "danger")
+        return redirect("/login")
 
+    favorites = Favorite.query.all()
+
+    return render_template("users/playlists.html", favorites=favorites)
+
+
+@app.route('/removefavorite/<int:work_id>', methods=["POST"])
+def delete_favorite(work_id):
+    """add to favorites"""
+    if not g.user:
+        flash("please login first", "danger")
+        return redirect("/login")
+
+    favorite = Favorite.query.get_or_404(work_id)
+    db.session.delete(favorite)
+    db.session.commit()
+    return redirect('/playlists')
 
 # @app.route('makeplaylist')
 # def make_playlist():
