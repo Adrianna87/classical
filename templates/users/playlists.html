@@ -8,6 +8,7 @@ Playlists
 
 <h1>Your playlists</h1>
 <div id="playlistPieces">
+  <h2>Find new music based on: Composer | Epoch | Genre</h2>
   {% for title in favorites %}
   <p>
   <form action="/removefavorite/{{title['id']}}" method="POST">

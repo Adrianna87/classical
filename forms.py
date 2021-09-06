@@ -25,10 +25,3 @@ class LoginForm(FlaskForm):
 
     username = StringField('Username', validators=[DataRequired()])
     password = PasswordField('Password', validators=[Length(min=6)])
-
-
-class ComposerForm(FlaskForm):
-    """Form for adding/editing playlists"""
-
-    name = StringField('text', validators=[DataRequired()])
-    epoch = TextAreaField('text', validators=[DataRequired()])
