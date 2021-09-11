@@ -153,9 +153,13 @@ def search_composers():
 
     resp = requests.get(url)
     info = resp.json()
-    composer_info = info['composers']
+    status = info['status']['success']
+    if status == "true":
+        composer_info = info['composers']
+    else:
+        composer_info = None
 
-    return render_template("search.html", info=composer_info)
+    return render_template("search.html", info=info, status=status, composer_info=composer_info)
 
 
 @app.route('/composer/<int:composer_id>')
@@ -203,15 +207,17 @@ def add_favorite(work_id):
     url = f"{API_BASE_URL}/work/detail/{work}.json"
     resp = requests.get(url)
     info = resp.json()
+    composer_id = info['composer']['id']
     favorite = Favorite(user_id=g.user.id,
                         composer_id=info['composer']['id'],
                         opus_work_id=info['work']['id'],
                         title=info['work']['title'],
-                        genre=info['work']['genre'])
+                        genre=info['work']['genre'],
+                        epoch=info['composer']['epoch'])
     db.session.add(favorite)
     db.session.commit()
 
-    return redirect('/playlists')
+    return redirect(f"/composer/{composer_id}")
 
 ##########
 # User routes

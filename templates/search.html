@@ -13,13 +13,15 @@ Search
   <input id="search" type="text" name="search" placeholder="Composer name">
   <button>Search</button>
 </form>
-{% if info %}
-<div id=composer-list>
+<div id="composer-list">
+  {% if status == "false" %}
+  {{info['status']['error']}}
+  {% elif status == "true" %}
   <ul id="composers">
-    {% for name in info %}
+    {% for name in composer_info %}
     <li><a href="/composer/{{name['id']}}" id="{{name['id']}}">{{name['complete_name']}}</a></li>
     {% endfor %}
   </ul>
+  {% endif %}
 </div>
-{% endif %}
 {% endblock %}

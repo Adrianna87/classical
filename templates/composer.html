@@ -15,7 +15,7 @@
   <ul id="works">
     {% for title in works %}
     <li>
-      <form action="/addfavorite/{{title['id']}}">
+      <form name="addToPlaylist" action="/addfavorite/{{title['id']}}">
         {{title['title']}} - {{title['genre']}}
         <button>Add to playlist</button>
       </form>

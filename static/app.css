@@ -1,6 +1,36 @@
 body {
-  background-color: lightblue
+  background-color: lightblue;
 }
+
+a {
+  text-decoration: none;
+}
+a:hover {
+  color: whitesmoke;
+}
+
 h1{
-  color:red
+  text-align: center;
+}
+h2{
+  text-align: center;
+}
+nav{
+  text-align: center;
+}
+.topnav{
+  font-size: 20px;
+}
+
+#search-form{
+  text-align: center;
+}
+
+#composer-list{
+  text-align: center;
+}
+#works-list{
+  margin: auto;
+  width: 1000px;
+  text-align:center;
 }

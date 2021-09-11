@@ -101,7 +101,6 @@ class Favorite(db.Model):
     opus_work_id = db.Column(
         db.Integer,
         nullable=False,
-        unique=True
     )
 
     title = db.Column(
@@ -113,8 +112,9 @@ class Favorite(db.Model):
         db.Text,
         nullable=False,
     )
-    users = db.relationship('User', backref='favorites')
 
-    # @classmethod
-    # def add_fav(cls, user_id, composer_id, opus_work_id, title, genre):
-    #     """add to favorites"""
+    epoch = db.Column(
+        db.Text,
+        nullable=False,
+    )
+    users = db.relationship('User', backref='favorites')
