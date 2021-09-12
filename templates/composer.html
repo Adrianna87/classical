@@ -17,7 +17,9 @@
     <li>
       <form name="addToPlaylist" action="/addfavorite/{{title['id']}}">
         {{title['title']}} - {{title['genre']}}
-        <button>Add to playlist</button>
+        <div class="right">
+          <button>Add to playlist</button>
+        </div>
       </form>
     </li>
     {% endfor %}

@@ -27,10 +27,23 @@ nav{
 }
 
 #composer-list{
-  text-align: center;
+  width: 400px;
+  margin-left: auto;
+  margin-right: auto;
 }
 #works-list{
   margin: auto;
-  width: 1000px;
-  text-align:center;
+  width: 100%;
+  font-size: large;
+  font-weight: bold;
 }
+.right{
+  text-align: right;
+}
+#signup{
+  text-align: center;
+}
+#login{
+  text-align: center;
+}
+

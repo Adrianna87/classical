@@ -7,14 +7,17 @@ Playlists
 {% block content %}
 
 <h1>Your playlists</h1>
+<h2>Find new music based on: Composer | Epoch | Genre</h2>
 <div id="playlistPieces">
-  <h2>Find new music based on: Composer | Epoch | Genre</h2>
+
   {% for title in favorites %}
   <p>
+    {% if title.user_id == g.user.id %}
   <form action="/removefavorite/{{title['id']}}" method="POST">
     {{title.title}}
     <button>Remove</button>
   </form>
+  {% endif %}
   </p>
   {% endfor %}
 </div>

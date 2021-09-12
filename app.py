@@ -172,8 +172,9 @@ def works_info(composer_id):
     info = resp.json()
     works = info['works']
     composer = info['composer']
+    favorites = Favorite.query.all()
 
-    return render_template("composer.html", works=works, info=info, composer=composer)
+    return render_template("composer.html", favorites=favorites, works=works, info=info, composer=composer)
 
 
 # @app.route('/workinfo/<int:work_id>')
@@ -208,14 +209,18 @@ def add_favorite(work_id):
     resp = requests.get(url)
     info = resp.json()
     composer_id = info['composer']['id']
-    favorite = Favorite(user_id=g.user.id,
-                        composer_id=info['composer']['id'],
-                        opus_work_id=info['work']['id'],
-                        title=info['work']['title'],
-                        genre=info['work']['genre'],
-                        epoch=info['composer']['epoch'])
-    db.session.add(favorite)
-    db.session.commit()
+    duplicate_check = Favorite.query.filter(
+        Favorite.opus_work_id == info['work']['id'], Favorite.user_id == g.user.id).first()
+    if duplicate_check is None:
+        favorite = Favorite(user_id=g.user.id,
+                            composer_id=info['composer']['id'],
+                            opus_work_id=info['work']['id'],
+                            title=info['work']['title'],
+                            genre=info['work']['genre'],
+                            epoch=info['composer']['epoch'])
+
+        db.session.add(favorite)
+        db.session.commit()
 
     return redirect(f"/composer/{composer_id}")
 
