@@ -1,6 +1,7 @@
 from flask import Flask, render_template, jsonify, request, flash, redirect, session, g
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.sql import func
 
 import requests
 
@@ -177,14 +178,35 @@ def works_info(composer_id):
     return render_template("composer.html", favorites=favorites, works=works, info=info, composer=composer)
 
 
-# @app.route('/workinfo/<int:work_id>')
-# def add_work(work_id):
-#     """add work to database"""
-#     work = work_id
-#     url = f"{API_BASE_URL}/work/detail/{work}.json"
-#     resp = requests.get(url)
-#     info = resp.json()
-#     return jsonify(info['composer'], info['work'])
+@app.route('/recs')
+def rec_page():
+    """recommendations page"""
+    return render_template("users/recs.html")
+
+
+@app.route('/searchepoch', methods=["POST"])
+def search_epoch():
+    """Determin user's preferred epoch based on playlist.
+    Suggest other pieces from same epoch"""
+    """SELECT epoch, 
+    COUNT(epoch) as cnt 
+    FROM favorites 
+    WHERE user_id=(g.user)
+    GROUP BY epoch
+    ORDER BY cnt DESC"""
+
+    # epoch = Favorite.query(func.count(Favorite.epoch), Favorite.epoch).filter_by(
+    #     g.user.id).group_by(Favorite.epoch).order_by(func.count(Favorite.epoch.desc())).first()
+
+    epoch = Favorite.query.filter(
+        Favorite.user_id == g.user.id).first()
+
+    url = f"{API_BASE_URL}/composer/list/epoch/{epoch.epoch}.json"
+    resp = requests.get(url)
+    info = resp.json()
+    composers = info['composers']
+
+    return render_template("users/recs.html", composers=composers)
 
 
 @app.route('/favorites')
@@ -235,63 +257,29 @@ def profile_page():
     if not g.user:
         flash("Please log in first", "danger")
         return redirect("/login")
+    user_id = g.user.id
+    user = User.query.get(user_id)
 
-    return render_template("users/profile.html")
-
-
-@app.route('/profile/<int:user_id>')
-def users_show(user_id):
-    """Show user profile."""
-
-    user = User.query.get_or_404(user_id)
-
-    return render_template('users/profile.html', user=user)
+    return render_template("users/profile.html", user=user)
 
 
-# @app.route('/users/profile', methods=["GET", "POST"])
-# def profile():
-#     """Update profile for current user."""
+@app.route('/users/delete', methods=["POST"])
+def delete_user():
+    """Delete user."""
 
-#     if not g.user:
-#         flash("Only logged in users can edit their profile!")
-#         return redirect("/")
+    if not g.user:
+        flash("Access unauthorized.", "danger")
+        return redirect("/")
 
-#     user = g.user
-#     form = UserEditForm(obj=user)
+    do_logout()
+    db.session.delete(g.user)
+    db.session.commit()
 
-#     if form.validate_on_submit():
-#         if User.authenticate(user.username, form.password.data):
-#             user.username = form.username.data
-#             user.email = form.email.data
-#             user.image_url = form.image_url.data or "/static/images/default-pic.png"
-#             user.header_image_url = form.header_image_url.data or "/static/images/warbler-hero.jpg"
-#             user.bio = form.bio.data
-
-#             db.session.commit()
-#             return redirect(f"/users/{user.id}")
-
-#         flash("Wrong password, please try again.", 'danger')
-
-#     return render_template('users/edit.html', form=form, user_id=user.id)
-
-
-# @app.route('/users/delete', methods=["POST"])
-# def delete_user():
-#     """Delete user."""
-
-#     if not g.user:
-#         flash("Access unauthorized.", "danger")
-#         return redirect("/")
-
-#     do_logout()
-
-#     db.session.delete(g.user)
-#     db.session.commit()
-
-#     return redirect("/signup")
+    return redirect("/signup")
 ##########
 # Playlist routes
 ##########
+
 
 @app.route('/playlists')
 def playlist_page():
@@ -315,10 +303,3 @@ def delete_favorite(work_id):
     db.session.delete(favorite)
     db.session.commit()
     return redirect('/playlists')
-
-# @app.route('makeplaylist')
-# def make_playlist():
-#   """Make playlist for user"""
-#   if not g.user:
-#       flash("please login first", "danger")
-#       return redirect("/login")

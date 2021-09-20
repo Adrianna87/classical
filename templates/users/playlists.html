@@ -7,7 +7,7 @@ Playlists
 {% block content %}
 
 <h1>Your playlists</h1>
-<h2>Find new music based on: Composer | Epoch | Genre</h2>
+<form action="/searchepoch" method="POST"><button>Find New Music</button></form>
 <div id="playlistPieces">
 
   {% for title in favorites %}

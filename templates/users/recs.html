@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Recommendations
+{% endblock %}
+
+{% block content %}
+<h1>Recommendations</h1>
+<ul>
+  {% for composer in composers %}
+  <li><a href="/composer/{{composer['id']}}" id="{{composer['id']}}">{{composer['complete_name']}}</a></li>
+  {% endfor %}
+</ul>
+{% endblock %}
